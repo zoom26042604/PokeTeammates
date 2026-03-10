@@ -17,16 +17,18 @@ def get_pokemon_from_range(start_id, end_id):
         data = response.json()
 
         try:
-            gen_resp = requests.get(data["species"]["url"], timeout=10)
-            gen_resp.raise_for_status()
-            generation = gen_resp.json()["generation"]["name"]
+            resp = requests.get(data["species"]["url"], timeout=10)
+            resp.raise_for_status()
+            generation = resp.json()["generation"]["name"]
+            name = next(entry["name"] for entry in resp.json()["names"] if entry["language"]["name"] == "fr")
         except requests.RequestException as exc:
             print(f"Failed to fetch generation for Pokemon ID {i}: {exc}")
             generation = None
+            name = None
 
         pokemon_list.append({
             "id": data["id"],
-            "name": data["name"],
+            "name": name,
             "types": [t["type"]["name"] for t in data["types"]],
             "abilities": [a["ability"]["name"] for a in data["abilities"]],
             "moves": [m["move"]["name"] for m in data["moves"]],
@@ -75,15 +77,17 @@ def get_pokemon_by_id(pokemon_id):
 
     data = response.json()
     try:
-        gen_resp = requests.get(data["species"]["url"], timeout=10)
-        gen_resp.raise_for_status()
-        generation = gen_resp.json()["generation"]["name"]
+        resp = requests.get(data["species"]["url"], timeout=10)
+        resp.raise_for_status()
+        generation = resp.json()["generation"]["name"]
+        name = next(entry["name"] for entry in resp.json()["names"] if entry["language"]["name"] == "fr")
     except requests.RequestException:
         generation = None
+        name =None
 
     return {
         "id": data["id"],
-        "name": data["name"],
+        "name": name,
         "types": [t["type"]["name"] for t in data["types"]],
         "abilities": [a["ability"]["name"] for a in data["abilities"]],
         "moves": [m["move"]["name"] for m in data["moves"]],
